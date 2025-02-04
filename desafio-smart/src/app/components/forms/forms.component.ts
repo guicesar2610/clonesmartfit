@@ -1,5 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
+import { Location } from 'src/app/interfaces/location.interface';
+import { FilterUnitsService } from 'src/app/services/filter-units.service';
 import { GetUnitsService } from 'src/app/services/get-units.service';
 
 @Component({
@@ -8,25 +10,39 @@ import { GetUnitsService } from 'src/app/services/get-units.service';
   styleUrls: ['./forms.component.scss'],
 })
 export class FormsComponent implements OnInit {
-  results = [];
+  @Output() submitEvent = new EventEmitter();
+  results: Location[] = [];
+  filteredResults: Location[] = [];
   formGroup!: FormGroup;
 
   constructor(
     private formBuilder: FormBuilder,
-    private unitService: GetUnitsService
+    private unitService: GetUnitsService,
+    private filterUnitsService: FilterUnitsService
   ) {}
 
   ngOnInit(): void {
-    this.unitService
-      .getAllUnits()
-      .subscribe((data) => console.log('data', data));
     this.formGroup = this.formBuilder.group({
       hour: '',
-      showClosed: false,
+      showClosed: true,
+    });
+    this.unitService.getAllUnits().subscribe((data) => {
+      this.results = data;
+      this.filteredResults = data;
     });
   }
 
-  onSubmit(): void {}
+  onSubmit(): void {
+    let { showClosed, hour } = this.formGroup.value;
+    this.filteredResults = this.filterUnitsService.filter(
+      this.results,
+      showClosed,
+      hour
+    );
+    this.unitService.setFilteredUnits(this.filteredResults);
+
+    this.submitEvent.emit();
+  }
 
   onClean(): void {
     this.formGroup.reset();
