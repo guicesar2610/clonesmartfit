@@ -1,6 +1,7 @@
 # Desafio Frontend - Smart Fit
 
-![Smart Fit](./src/assets/images/svg/logo.svg)
+![image](https://github.com/user-attachments/assets/44bc953f-b770-42f7-a86b-24494acd5247)
+
 
 ## 📖 Sobre o desafio
 
